@@ -1,5 +1,6 @@
 package com.castrodev.popularmovies;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -10,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,6 +33,7 @@ import java.util.Locale;
  */
 public class MainActivityFragment extends Fragment {
 
+    public static final String MOVIE_OBJECT = "movie_object";
     private MovieAdapter movieAdapter;
 
     public MainActivityFragment() {
@@ -50,7 +51,9 @@ public class MainActivityFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
                 Movie movie = movieAdapter.getItem(position);
-                Toast.makeText(getActivity(), "Clicou: "+movie.originalTitle , Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(getActivity(), DetailActivity.class);
+                intent.putExtra(MOVIE_OBJECT, movie);
+                startActivity(intent);
             }
         });
         gridView.setAdapter(movieAdapter);

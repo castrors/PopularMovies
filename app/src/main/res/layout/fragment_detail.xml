@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/content_detail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:context="com.castrodev.popularmovies.DetailActivityFragment"
+        tools:showIn="@layout/activity_detail">
+
+        <TextView
+            android:id="@+id/text_movie_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:padding="16dp"
+            android:text="Chappie"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display2"
+            android:textColor="@android:color/white"/>
+
+        <ImageView
+            android:id="@+id/image_movie_poster"
+            android:layout_width="120dp"
+            android:layout_height="200dp"
+            android:layout_below="@id/text_movie_title"
+            android:layout_margin="24dp" />
+
+        <TextView
+            android:id="@+id/text_release_year"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/image_movie_poster"
+            android:layout_marginLeft="24dp"
+            android:layout_marginStart="24dp"
+            android:layout_toEndOf="@+id/image_movie_poster"
+            android:layout_toRightOf="@+id/image_movie_poster"
+            android:text="2015"
+            android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+
+        <TextView
+            android:id="@+id/text_rating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/text_release_year"
+            android:layout_alignStart="@+id/text_release_year"
+            android:layout_below="@+id/text_release_year"
+            android:text="8.1/10"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption" />
+
+        <TextView
+            android:id="@+id/text_synopsis"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/image_movie_poster"
+            android:layout_margin="16dp"
+            android:text="Mussum Ipsum, cacilds vidis litro abertis. Nec orci ornare consequat. Praesent lacinia ultrices consectetur. Sed non ipsum felis. Delegadis gente finis, bibendum egestas augue arcu ut est. Manduma pindureta quium dia nois paga. Diuretics paradis num copo é motivis de denguis." />
+
+    </RelativeLayout>
+</ScrollView>
