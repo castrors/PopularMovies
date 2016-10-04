@@ -2,4 +2,10 @@
     <string name="app_name">Popular Movies</string>
     <string name="action_settings">Settings</string>
     <string name="title_activity_detail">DetailActivity</string>
+    <string name="pref_sorting_label">Ordenar por</string>
+    <string name="pref_sorting_key">sorting</string>
+    <string name="pref_sorting_label_most_popular" translatable="false">Mais populares</string>
+    <string name="pref_sorting_label_top_rated" translatable="false">Melhores avaliados</string>
+    <string name="pref_sorting_most_popular" translatable="false">/movie/popular?</string>
+    <string name="pref_sorting_top_rated" translatable="false">/movie/top_rated?</string>
 </resources>

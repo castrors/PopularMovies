@@ -1,9 +1,11 @@
 package com.castrodev.popularmovies;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -69,7 +71,11 @@ public class MainActivityFragment extends Fragment {
 
     private void updateMovies() {
         FetchMoviesTask fetchMoviesTask = new FetchMoviesTask();
-        fetchMoviesTask.execute();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String sortingOption = prefs.getString(getString(R.string.pref_sorting_key),
+                getString(R.string.pref_sorting_most_popular));
+
+        fetchMoviesTask.execute(sortingOption);
     }
 
     public class FetchMoviesTask extends AsyncTask<String, Void, Movie[]> {
@@ -128,6 +134,10 @@ public class MainActivityFragment extends Fragment {
         @Override
         protected Movie[] doInBackground(String... params) {
 
+            if (params.length == 0) {
+                return null;
+            }
+
             // These two need to be declared outside the try/catch
             // so that they can be closed in the finally block.
             HttpURLConnection urlConnection = null;
@@ -136,18 +146,15 @@ public class MainActivityFragment extends Fragment {
             // Will contain the raw JSON response as a string.
             String moviesJsonStr = null;
 
-
             try {
                 // Construct the URL for the OpenWeatherMap query
                 // Possible parameters are avaiable at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
                 final String FORECAST_BASE_URL = "http://api.themoviedb.org/3";
-                final String POPULAR_URL = "/movie/popular?";
-                final String TOP_RATED_URL = "/movie/top_rated?";
-
                 final String API_KEY_PARAM = "api_key";
 
-                Uri builtUri = Uri.parse(FORECAST_BASE_URL.concat(POPULAR_URL)).buildUpon()
+                String sortingOption = params[0];
+                Uri builtUri = Uri.parse(FORECAST_BASE_URL.concat(sortingOption)).buildUpon()
                         .appendQueryParameter(API_KEY_PARAM, BuildConfig.TMDB_API_KEY)
                         .build();
 

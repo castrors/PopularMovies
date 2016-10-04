@@ -29,6 +29,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.castrodev.popularmovies.MainActivity" />
         </activity>
+        <activity android:name=".SettingsActivity"></activity>
     </application>
 
 </manifest>
