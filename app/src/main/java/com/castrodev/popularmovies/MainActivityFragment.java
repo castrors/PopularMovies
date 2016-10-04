@@ -8,6 +8,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.GridView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,6 +24,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -29,13 +33,29 @@ import java.util.Locale;
  */
 public class MainActivityFragment extends Fragment {
 
+    private MovieAdapter movieAdapter;
+
     public MainActivityFragment() {
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_main, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+        movieAdapter = new MovieAdapter(getActivity(), new ArrayList<Movie>());
+
+        GridView gridView = (GridView) rootView.findViewById(R.id.movies_grid);
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
+                Movie movie = movieAdapter.getItem(position);
+                Toast.makeText(getActivity(), "Clicou: "+movie.originalTitle , Toast.LENGTH_SHORT).show();
+            }
+        });
+        gridView.setAdapter(movieAdapter);
+
+        return rootView;
     }
 
     @Override
@@ -160,7 +180,7 @@ public class MainActivityFragment extends Fragment {
                 }
                 moviesJsonStr = buffer.toString();
             } catch (IOException e) {
-                Log.e(LOG_TAG, "Error ", e);
+                Log.e(LOG_TAG, "Error " + e);
                 // If the code didn't successfully get the weather data, there's no point in attemping
                 // to parse it.
                 return null;
@@ -188,15 +208,14 @@ public class MainActivityFragment extends Fragment {
             return null;
         }
 
-//        @Override
-//        protected void onPostExecute(String[] result) {
-//            if (result != null) {
-//                mForecastAdapter.clear();
-//                for(String dayForecastStr : result) {
-//                    mForecastAdapter.add(dayForecastStr);
-//                }
-//                // New data is back from the server.  Hooray!
-//            }
-//        }
+        @Override
+        protected void onPostExecute(Movie[] result) {
+            if (result != null) {
+                movieAdapter.clear();
+                for(Movie movieResult : result) {
+                    movieAdapter.add(movieResult);
+                }
+            }
+        }
     }
 }
