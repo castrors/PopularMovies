@@ -8,4 +8,6 @@
     <string name="pref_sorting_label_top_rated" translatable="false">Top rated</string>
     <string name="pref_sorting_most_popular" translatable="false">/movie/popular?</string>
     <string name="pref_sorting_top_rated" translatable="false">/movie/top_rated?</string>
+    <string name="content_authority">com.castrodev.popularmovies</string>
+    <string name="sync_account_type">popularmovies.castrodev.com</string>
 </resources>

@@ -52,18 +52,38 @@ public class MovieContract {
 
         public static final String TABLE_NAME = "movie";
 
+        public static final String COLUMN_REMOTE_ID = "remote_id";
         public static final String COLUMN_IMAGE_URL = "image_url";
         public static final String COLUMN_ORIGINAL_TITLE = "original_title";
         public static final String COLUMN_SYNOPSIS = "synopsis";
         public static final String COLUMN_RATING = "rating";
-        public static final String COLUMN_RELEASE_DATE = "releaseDate";
+        public static final String COLUMN_RELEASE_DATE = "release_date";
+        public static final String COLUMN_SORTING_PREFERENCE = "sorting_preference";
+
 
         public static Uri buildMovieUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
         }
 
-        public static Long getMovieIdFromUri(Uri uri) {
-            return Long.parseLong(uri.getPathSegments().get(1));
+        public static Uri buildMovieWithSortingPreference(
+                String sortingPreference) {
+            return CONTENT_URI.buildUpon().appendPath(sortingPreference).build();
         }
+
+        public static Uri buildMovieSortingWithRemoteId(String sortingPreference, long remoteId) {
+            return CONTENT_URI.buildUpon().appendPath(sortingPreference)
+                    .appendPath(Long.toString(remoteId)).build();
+        }
+
+        public static String getMovieSortingFromUri(Uri uri) {
+            return uri.getPathSegments().get(1);
+        }
+
+        public static long getMovieRemoteIdFromUri(Uri uri) {
+            return Long.valueOf(uri.getPathSegments().get(2));
+        }
+
+
     }
+
 }

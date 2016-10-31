@@ -42,6 +42,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         // location setting, the city name, and the latitude and longitude
         final String SQL_CREATE_MOVIE_TABLE = "CREATE TABLE " + MovieEntry.TABLE_NAME + " (" +
                 MovieContract.MovieEntry._ID + " INTEGER PRIMARY KEY," +
+                MovieEntry.COLUMN_REMOTE_ID + " INTEGER UNIQUE NOT NULL, " +
                 MovieEntry.COLUMN_IMAGE_URL + " TEXT NOT NULL, " +
                 MovieEntry.COLUMN_ORIGINAL_TITLE + " TEXT UNIQUE NOT NULL, " +
                 MovieEntry.COLUMN_SYNOPSIS + " TEXT NOT NULL, " +

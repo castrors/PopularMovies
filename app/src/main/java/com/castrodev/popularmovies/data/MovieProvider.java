@@ -31,7 +31,8 @@ public class MovieProvider extends ContentProvider {
     private MovieDbHelper mOpenHelper;
 
     static final int MOVIE = 100;
-    static final int MOVIE_WITH_ID = 101;
+    static final int MOVIE_WITH_SORTING = 101;
+    static final int MOVIE_SORTING_WITH_ORIGINAL_TITLE = 102;
 
     private static final SQLiteQueryBuilder sMovieQueryBuilder;
 
@@ -44,25 +45,46 @@ public class MovieProvider extends ContentProvider {
                 MovieContract.MovieEntry.TABLE_NAME);
     }
 
-    //movie.movie_id = ?
-    private static final String sMovieWithIdSelection =
+
+    //sorting.sorting_preference = ?
+    private static final String sSortingPreferenceSelection =
+            MovieContract.MovieEntry.COLUMN_SORTING_PREFERENCE + " = ? ";
+
+    //sorting.sorting_preference = ? AND remote_id = ?
+    private static final String sSortingPreferenceAndOriginalTitleSelection =
             MovieContract.MovieEntry.TABLE_NAME +
-                    "." + MovieContract.MovieEntry._ID + " = ? ";
+                    "." + MovieContract.MovieEntry.COLUMN_SORTING_PREFERENCE + " = ? AND " +
+                    MovieContract.MovieEntry.COLUMN_REMOTE_ID + " = ? ";
 
 
-    private Cursor getMovieById(Uri uri, String[] projection, String sortOrder) {
-        long id = MovieContract.MovieEntry.getMovieIdFromUri(uri);
+    private Cursor getMovieBySortingPreference(Uri uri, String[] projection, String sortOrder) {
+        String sortingPreference = MovieContract.MovieEntry.getMovieSortingFromUri(uri);
 
         String[] selectionArgs;
         String selection;
 
-        selection = sMovieWithIdSelection;
-        selectionArgs = new String[]{Long.toString(id)};
+        selection = sSortingPreferenceSelection;
+        selectionArgs = new String[]{sortingPreference};
 
         return sMovieQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
                 selection,
                 selectionArgs,
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+    private Cursor getMovieBySortingPreferenceAndRemoteId(
+            Uri uri, String[] projection, String sortOrder) {
+        String sortingPreference = MovieContract.MovieEntry.getMovieSortingFromUri(uri);
+        long remoteId = MovieContract.MovieEntry.getMovieRemoteIdFromUri(uri);
+
+        return sMovieQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                sSortingPreferenceAndOriginalTitleSelection,
+                new String[]{sortingPreference, Long.toString(remoteId)},
                 null,
                 null,
                 sortOrder
@@ -87,7 +109,9 @@ public class MovieProvider extends ContentProvider {
 
         // For each type of URI you want to add, create a corresponding code.
         matcher.addURI(authority, MovieContract.PATH_MOVIE, MOVIE);
-        matcher.addURI(authority, MovieContract.PATH_MOVIE + "/#", MOVIE_WITH_ID);
+        matcher.addURI(authority, MovieContract.PATH_MOVIE + "/*", MOVIE_WITH_SORTING);
+        matcher.addURI(authority, MovieContract.PATH_MOVIE + "/*/*", MOVIE_SORTING_WITH_ORIGINAL_TITLE);
+
 
         return matcher;
     }
@@ -114,14 +138,16 @@ public class MovieProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
 
         switch (match) {
-            // Student: Uncomment and fill out these two cases
-            case MOVIE_WITH_ID:
+            case MOVIE_SORTING_WITH_ORIGINAL_TITLE:
                 return MovieContract.MovieEntry.CONTENT_ITEM_TYPE;
+            case MOVIE_WITH_SORTING:
+                return MovieContract.MovieEntry.CONTENT_TYPE;
             case MOVIE:
                 return MovieContract.MovieEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
+
     }
 
     @Override
@@ -131,12 +157,17 @@ public class MovieProvider extends ContentProvider {
         // and query the database accordingly.
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
-            // "weather/*/*"
-            case MOVIE_WITH_ID: {
-                retCursor = getMovieById(uri, projection, sortOrder);
+            // "movie/*/*"
+            case MOVIE_SORTING_WITH_ORIGINAL_TITLE: {
+                retCursor = getMovieBySortingPreferenceAndRemoteId(uri, projection, sortOrder);
                 break;
             }
-            // "weather"
+            // "movie/*"
+            case MOVIE_WITH_SORTING: {
+                retCursor = getMovieBySortingPreference(uri, projection, sortOrder);
+                break;
+            }
+            // "movie"
             case MOVIE: {
                 retCursor = mOpenHelper.getReadableDatabase().query(
                         MovieContract.MovieEntry.TABLE_NAME,
@@ -149,7 +180,6 @@ public class MovieProvider extends ContentProvider {
                 );
                 break;
             }
-
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }

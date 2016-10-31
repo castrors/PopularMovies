@@ -1,43 +1,55 @@
 package com.castrodev.popularmovies;
 
-import android.app.Activity;
-import android.support.annotation.NonNull;
+import android.content.Context;
+import android.database.Cursor;
+import android.support.v4.widget.CursorAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
-
-import java.util.List;
 
 /**
  * Created by rodrigocastro on 03/10/16.
  */
 
-public class MovieAdapter extends ArrayAdapter<Movie> {
-
+public class MovieAdapter extends CursorAdapter {
 
     public static final String IMAGE_URL_PREFIX = "http://image.tmdb.org/t/p/w185/";
 
-    public MovieAdapter(Activity context, List<Movie> movies) {
-        super(context, 0, movies);
+    public MovieAdapter(Context context, Cursor c, int flags) {
+        super(context, c, flags);
     }
 
-    @NonNull
+
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        Movie movie = getItem(position);
+    public View newView(Context context, Cursor cursor, ViewGroup parent) {
 
-        if(convertView ==null){
-            convertView = LayoutInflater.from(getContext()).inflate(
-                    R.layout.movie_item, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.movie_item, parent, false);
+
+        ViewHolder viewHolder = new ViewHolder(view);
+        view.setTag(viewHolder);
+
+        return view;
+    }
+
+    @Override
+    public void bindView(View view, Context context, Cursor cursor) {
+
+        ViewHolder viewHolder = (ViewHolder) view.getTag();
+
+        Picasso.with(context)
+                .load(IMAGE_URL_PREFIX.concat(cursor.getString(MainActivityFragment.COL_MOVIE_IMAGE_URL)))
+                .into(viewHolder.iconView);
+
+    }
+
+    public static class ViewHolder {
+        public final ImageView iconView;
+
+        public ViewHolder(View view) {
+            iconView = (ImageView) view.findViewById(R.id.movie_image);
         }
-
-        ImageView movieImage = (ImageView) convertView.findViewById(R.id.movie_image);
-        Picasso.with(getContext()).load(IMAGE_URL_PREFIX.concat(movie.imageUrl)).into(movieImage);
-
-        return convertView;
     }
 }
