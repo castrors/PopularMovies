@@ -40,6 +40,8 @@ public class MovieContract {
         return time.setJulianDay(julianDay);
     }
 
+
+
     public static final class MovieEntry implements BaseColumns {
 
         public static final Uri CONTENT_URI =

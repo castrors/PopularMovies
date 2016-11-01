@@ -4,20 +4,23 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.AbstractThreadedSyncAdapter;
 import android.content.ContentProviderClient;
+import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
+import android.content.OperationApplicationException;
 import android.content.SyncRequest;
 import android.content.SyncResult;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.RemoteException;
 import android.util.Log;
 
 import com.castrodev.popularmovies.BuildConfig;
 import com.castrodev.popularmovies.R;
 import com.castrodev.popularmovies.Utility;
-import com.castrodev.popularmovies.data.MovieContract;
+import com.castrodev.popularmovies.data.MovieColumns;
+import com.castrodev.popularmovies.data.MovieProvider;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,9 +34,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Vector;
 
 public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
     public final String LOG_TAG = PopularMoviesSyncAdapter.class.getSimpleName();
@@ -148,7 +151,7 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
             JSONObject moviesJson = new JSONObject(moviesJsonString);
             JSONArray moviesArray = moviesJson.getJSONArray(TMDB_LIST);
 
-            Vector<ContentValues> cVVector = new Vector<ContentValues>(moviesArray.length());
+            ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
 
             for (int i = 0; i < moviesArray.length(); i++) {
                 String originalTitle;
@@ -165,29 +168,31 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
                 rating = currentMovie.getDouble(MOVIE_RATING);
                 releaseDate = getDate(currentMovie.getString(MOVIE_RELEASE_DATE));
 
-                ContentValues movieValues = new ContentValues();
-
-                movieValues.put(MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE, originalTitle);
-                movieValues.put(MovieContract.MovieEntry.COLUMN_IMAGE_URL, imageUrl);
-                movieValues.put(MovieContract.MovieEntry.COLUMN_SYNOPSIS, synopsis);
-                movieValues.put(MovieContract.MovieEntry.COLUMN_RATING, rating);
-                movieValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, releaseDate.getTime());
-
-                cVVector.add(movieValues);
+                ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
+                        MovieProvider.Movies.CONTENT_URI);
+                builder.withValue(MovieColumns.ORIGINAL_TITLE, originalTitle);
+                builder.withValue(MovieColumns.IMAGE_URL, imageUrl);
+                builder.withValue(MovieColumns.SYNOPSIS, synopsis);
+                builder.withValue(MovieColumns.RATING, rating);
+                builder.withValue(MovieColumns.RELEASE_DATE, releaseDate.getTime());
+                batchOperations.add(builder.build());
 
             }
 
             int inserted = 0;
             // add to database
-            if (cVVector.size() > 0) {
-                ContentValues[] cvArray = new ContentValues[cVVector.size()];
-                cVVector.toArray(cvArray);
-                getContext().getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, cvArray);
+            if (batchOperations.size() > 0) {
+
+                try{
+                    getContext().getContentResolver().applyBatch(MovieProvider.AUTHORITY, batchOperations);
+                } catch(RemoteException | OperationApplicationException e){
+                    Log.e(LOG_TAG, "Error applying batch insert", e);
+                }
 
 //                notifyWeather();
             }
 
-            Log.d(LOG_TAG, "Sync Complete. " + cVVector.size() + " Inserted");
+            Log.d(LOG_TAG, "Sync Complete. " + batchOperations.size() + " Inserted");
 
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);

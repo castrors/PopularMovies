@@ -1,5 +1,6 @@
-package com.castrodev.popularmovies;
+package com.castrodev.popularmovies.rest;
 
+import android.database.Cursor;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -15,23 +16,30 @@ public class Movie implements Parcelable {
 
     public static final String DATE_YEAR_PATTERN = "yyyy";
 
+    Long remoteId;
     String imageUrl;
     String originalTitle;
     String synopsis;
+    String sortingPreference;
     Double rating;
     Date releaseDate;
 
-    public Movie(String imageUrl, String originalTitle, String synopsis, Double rating, Date releaseDate) {
+    public Movie(Long remoteId, String imageUrl, String originalTitle, String synopsis, String sortingPreference, Double rating, Date releaseDate) {
+        this.remoteId = remoteId;
         this.imageUrl = imageUrl;
         this.originalTitle = originalTitle;
+        this.sortingPreference = sortingPreference;
         this.synopsis = synopsis;
         this.rating = rating;
         this.releaseDate = releaseDate;
+
     }
 
     protected Movie(Parcel in) {
+        remoteId = in.readLong();
         imageUrl = in.readString();
         originalTitle = in.readString();
+        sortingPreference = in.readString();
         synopsis = in.readString();
         rating = in.readDouble();
         releaseDate = new Date(in.readLong());
@@ -40,8 +48,10 @@ public class Movie implements Parcelable {
     @Override
     public String toString() {
         return "Movie{" +
-                "imageUrl='" + imageUrl + '\'' +
+                "remoteId='" + remoteId + '\'' +
+                ", imageUrl='" + imageUrl + '\'' +
                 ", originalTitle='" + originalTitle + '\'' +
+                ", sortingPreference='" + sortingPreference + '\'' +
                 ", synopsis='" + synopsis + '\'' +
                 ", rating=" + rating +
                 ", releaseDate=" + releaseDate +
@@ -55,8 +65,10 @@ public class Movie implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeLong(remoteId);
         parcel.writeString(imageUrl);
         parcel.writeString(originalTitle);
+        parcel.writeString(sortingPreference);
         parcel.writeString(synopsis);
         parcel.writeDouble(rating);
         parcel.writeLong(releaseDate.getTime());
@@ -82,5 +94,9 @@ public class Movie implements Parcelable {
 
     public String getRating() {
         return rating.toString()+"/10";
+    }
+
+    public static Movie fromCursor(Cursor cursor) {
+        return null;
     }
 }

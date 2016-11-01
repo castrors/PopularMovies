@@ -7,25 +7,29 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
 
 import com.castrodev.popularmovies.data.MovieContract;
+import com.castrodev.popularmovies.data.MovieProvider;
+import com.castrodev.popularmovies.rest.Movie;
+import com.castrodev.popularmovies.rest.MovieCursorAdapter;
 import com.castrodev.popularmovies.sync.PopularMoviesSyncAdapter;
 
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, OnItemClickListener {
     public static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
 
-    private MovieAdapter mMovieAdapter;
+    private MovieCursorAdapter mMovieCursorAdapter;
     private int mPosition = GridView.INVALID_POSITION;
-    private GridView mGridView;
+    private RecyclerView mRecyclerViewMoviesGrid;
 
     public static final String MOVIE_OBJECT = "movie_object";
     private static final int MOVIES_LOADER = 0;
@@ -47,11 +51,17 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     static final int COL_MOVIE_ID = 0;
     static final int COL_MOVIE_ORIGINAL_TITLE = 1;
-    static final int COL_MOVIE_IMAGE_URL = 2;
+    public static final int COL_MOVIE_IMAGE_URL = 2;
     static final int COL_MOVIE_RATING = 3;
     static final int COL_MOVIE_RELEASE_DATE = 4;
     static final int COL_MOVIE_SYNOPSIS = 5;
 
+
+    @Override
+    public void onItemClick(Movie movie) {
+        String sortingPreference = Utility.getPreferredSorting(getActivity());
+//        ((Callback) getActivity()).onItemSelected(MovieContract.MovieEntry.buildMovieSortingWithRemoteId(sortingPreference, ));
+    }
 
 
     public interface Callback {
@@ -68,42 +78,17 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
         // The ForecastAdapter will take data from a source and
         // use it to populate the ListView it's attached to.
-        mMovieAdapter = new MovieAdapter(getActivity(), null, 0);
+        mMovieCursorAdapter = new MovieCursorAdapter(getActivity(), null, this);
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         // Get a reference to the ListView, and attach this adapter to it.
-        mGridView = (GridView) rootView.findViewById(R.id.movies_grid);
-        mGridView.setAdapter(mMovieAdapter);
-        // We'll call our MainActivity
-        mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mRecyclerViewMoviesGrid = (RecyclerView) rootView.findViewById(R.id.movies_grid);
+        mRecyclerViewMoviesGrid.setLayoutManager(
+                new GridLayoutManager(mRecyclerViewMoviesGrid.getContext(), 2)
+        );
+        mRecyclerViewMoviesGrid.setAdapter(mMovieCursorAdapter);
 
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                // CursorAdapter returns a cursor at the correct position for getItem(), or null
-                // if it cannot seek to that position.
-                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
-//                if (cursor != null) {
-//                    String locationSetting = Utility.getPreferredLocation(getActivity());
-//                    ((Callback) getActivity())
-//                            .onItemSelected(MovieContract.MovieEntry.buildMovieWithSortingPreference(
-//                                    locationSetting, cursor.getLong(COL_WEATHER_DATE)
-//                            ));
-//                }
-                mPosition = position;
-            }
-        });
-
-        // If there's instance state, mine it for useful information.
-        // The end-goal here is that the user never knows that turning their device sideways
-        // does crazy lifecycle related things.  It should feel like some stuff stretched out,
-        // or magically appeared to take advantage of room, but data or place in the app was never
-        // actually *lost*.
-//        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
-//            // The listview probably hasn't even been populated yet.  Actually perform the
-//            // swapout in onLoadFinished.
-//            mPosition = savedInstanceState.getInt(SELECTED_KEY);
-//        }
 
         return rootView;
     }
@@ -128,12 +113,12 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
         String sortingPreference = Utility.getPreferredSorting(getActivity());
-        Uri moviesUri = MovieContract.MovieEntry.buildMovieWithSortingPreference(
-                sortingPreference);
+//        Uri moviesUri = MovieContract.MovieEntry.buildMovieWithSortingPreference(
+//                sortingPreference);
 
         return new CursorLoader(getActivity(),
-                moviesUri,
-                MOVIES_COLUMNS,
+                MovieProvider.Movies.CONTENT_URI,
+                null,
                 null,
                 null,
                 null);
@@ -141,11 +126,11 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mMovieAdapter.swapCursor(data);
+        mMovieCursorAdapter.swapCursor(data);
         if (mPosition != ListView.INVALID_POSITION) {
             // If we don't need to restart the loader, and there's a desired position to restore
             // to, do so now.
-            mGridView.smoothScrollToPosition(mPosition);
+            mRecyclerViewMoviesGrid.smoothScrollToPosition(mPosition);
         }
     }
 

@@ -9,10 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.castrodev.popularmovies.rest.Movie;
 
 import static com.castrodev.popularmovies.MainActivityFragment.MOVIE_OBJECT;
-import static com.castrodev.popularmovies.MovieAdapter.IMAGE_URL_PREFIX;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -39,11 +38,11 @@ public class DetailActivityFragment extends Fragment {
         if(intent!=null && intent.hasExtra(MOVIE_OBJECT)){
             movie = intent.getParcelableExtra(MOVIE_OBJECT);
 
-            Picasso.with(getContext()).load(IMAGE_URL_PREFIX.concat(movie.imageUrl)).into(imageMoviePoster);
-            textMovieTitle.setText(movie.originalTitle);
-            textReleaseYear.setText(movie.getReleaseDate());
-            textRating.setText(movie.getRating());
-            textSynopsis.setText(movie.synopsis);
+//            Picasso.with(getContext()).load(IMAGE_URL_PREFIX.concat(movie.imageUrl)).into(imageMoviePoster);
+//            textMovieTitle.setText(movie.originalTitle);
+//            textReleaseYear.setText(movie.getReleaseDate());
+//            textRating.setText(movie.getRating());
+//            textSynopsis.setText(movie.synopsis);
         }
 
         return rootView;

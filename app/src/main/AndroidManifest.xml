@@ -40,10 +40,10 @@
         <activity android:name=".SettingsActivity"></activity>
 
         <provider
-            android:authorities="@string/content_authority"
-            android:name=".data.MovieProvider"
-            android:exported="false"
-            android:syncable="true" />
+        android:authorities="com.castrodev.popularmovies.data.MovieProvider"
+        android:name=".data.generated.MovieProvider"
+        android:exported="false"
+            android:syncable="true"/>
 
         <!-- SyncAdapter's dummy authentication service -->
         <service android:name=".sync.PopularMoviesAuthenticatorService">
