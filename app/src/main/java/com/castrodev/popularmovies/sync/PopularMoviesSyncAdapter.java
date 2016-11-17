@@ -45,7 +45,7 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
     // Interval at which to sync with the weather, in seconds.
     // 60 seconds (1 minute) * 180 = 3 hours
     public static final int SYNC_INTERVAL = 60 * 180;
-    public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
+    public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
     private static final long DAY_IN_MILLIS = 1000 * 60 * 60 * 24;
 //    private static final int WEATHER_NOTIFICATION_ID = 3004;
 //
@@ -140,6 +140,7 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
             throws JSONException {
 
         final String TMDB_LIST = "results";
+        final String MOVIE_REMOTE_ID = "id";
         final String MOVIE_ORIGINAL_TITLE = "original_title";
         final String MOVIE_IMAGE = "poster_path";
         final String MOVIE_SYNOPSIS = "overview";
@@ -159,17 +160,21 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
                 String synopsis;
                 Double rating;
                 Date releaseDate;
+                Long remoteId;
 
                 JSONObject currentMovie = moviesArray.getJSONObject(i);
 
+                remoteId = currentMovie.getLong(MOVIE_REMOTE_ID);
                 originalTitle = currentMovie.getString(MOVIE_ORIGINAL_TITLE);
                 imageUrl = currentMovie.getString(MOVIE_IMAGE);
                 synopsis = currentMovie.getString(MOVIE_SYNOPSIS);
                 rating = currentMovie.getDouble(MOVIE_RATING);
                 releaseDate = getDate(currentMovie.getString(MOVIE_RELEASE_DATE));
 
+
                 ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
                         MovieProvider.Movies.CONTENT_URI);
+                builder.withValue(MovieColumns.REMOTE_ID, remoteId);
                 builder.withValue(MovieColumns.ORIGINAL_TITLE, originalTitle);
                 builder.withValue(MovieColumns.IMAGE_URL, imageUrl);
                 builder.withValue(MovieColumns.SYNOPSIS, synopsis);
@@ -179,13 +184,14 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
 
             }
 
+
             int inserted = 0;
             // add to database
             if (batchOperations.size() > 0) {
 
-                try{
+                try {
                     getContext().getContentResolver().applyBatch(MovieProvider.AUTHORITY, batchOperations);
-                } catch(RemoteException | OperationApplicationException e){
+                } catch (RemoteException | OperationApplicationException e) {
                     Log.e(LOG_TAG, "Error applying batch insert", e);
                 }
 
@@ -211,8 +217,6 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
 
-
-
     /**
      * Helper method to schedule the sync adapter periodic execution
      */
@@ -234,6 +238,7 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
 
     /**
      * Helper method to have the sync adapter sync immediately
+     *
      * @param context The context used to access the account service
      */
     public static void syncImmediately(Context context) {
@@ -262,7 +267,7 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
                 context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
 
         // If the password doesn't exist, the account doesn't exist
-        if ( null == accountManager.getPassword(newAccount) ) {
+        if (null == accountManager.getPassword(newAccount)) {
 
         /*
          * Add the account and account type, no password or user data

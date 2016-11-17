@@ -3,11 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:columnWidth="150dp"
-    android:numColumns="auto_fit"
-    android:verticalSpacing="0dp"
-    android:horizontalSpacing="0dp"
-    android:stretchMode="columnWidth"
+    android:scrollbars="vertical"
     tools:context=".MainActivityFragment"
     android:id="@+id/movies_grid">
 </android.support.v7.widget.RecyclerView>

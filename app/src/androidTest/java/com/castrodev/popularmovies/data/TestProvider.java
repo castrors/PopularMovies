@@ -20,7 +20,6 @@ import android.content.ContentValues;
 import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.test.AndroidTestCase;
 
@@ -147,30 +146,30 @@ public class TestProvider extends AndroidTestCase {
        read out the data.  Uncomment this test to see if the basic weather query functionality
        given in the ContentProvider is working correctly.
     */
-    public void testBasicWeatherQuery() {
-        // insert our test records into the database
-        MovieDbHelper dbHelper = new MovieDbHelper(mContext);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        ContentValues movieValues = TestUtilities.createMovieJackReacherValues();
-
-        long movieRowId = db.insert(MovieEntry.TABLE_NAME, null, movieValues);
-        assertTrue("Unable to Insert WeatherEntry into the Database", movieRowId != -1);
-
-        db.close();
-
-        // Test the basic content provider query
-        Cursor movieCursor = mContext.getContentResolver().query(
-                MovieEntry.CONTENT_URI,
-                null,
-                null,
-                null,
-                null
-        );
-
-        // Make sure we get the correct cursor out of the database
-        TestUtilities.validateCursor("testBasicWeatherQuery", movieCursor, movieValues);
-    }
+//    public void testBasicWeatherQuery() {
+//        // insert our test records into the database
+//        MovieDbHelper dbHelper = new MovieDbHelper(mContext);
+//        SQLiteDatabase db = dbHelper.getWritableDatabase();
+//
+//        ContentValues movieValues = TestUtilities.createMovieJackReacherValues();
+//
+//        long movieRowId = db.insert(MovieEntry.TABLE_NAME, null, movieValues);
+//        assertTrue("Unable to Insert WeatherEntry into the Database", movieRowId != -1);
+//
+//        db.close();
+//
+//        // Test the basic content provider query
+//        Cursor movieCursor = mContext.getContentResolver().query(
+//                MovieEntry.CONTENT_URI,
+//                null,
+//                null,
+//                null,
+//                null
+//        );
+//
+//        // Make sure we get the correct cursor out of the database
+//        TestUtilities.validateCursor("testBasicWeatherQuery", movieCursor, movieValues);
+//    }
 
 
 

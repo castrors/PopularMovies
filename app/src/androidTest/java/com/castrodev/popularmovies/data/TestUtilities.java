@@ -1,10 +1,8 @@
 package com.castrodev.popularmovies.data;
 
 import android.content.ContentValues;
-import android.content.Context;
 import android.database.ContentObserver;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -60,20 +58,20 @@ public class TestUtilities extends AndroidTestCase {
         return movieValues;
     }
 
-    static long insertJackReacherValues(Context context) {
-        // insert our test records into the database
-        MovieDbHelper dbHelper = new MovieDbHelper(context);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-        ContentValues testValues = TestUtilities.createMovieJackReacherValues();
-
-        long locationRowId;
-        locationRowId = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, testValues);
-
-        // Verify we got a row back.
-        assertTrue("Error: Failure to insert North Pole Location Values", locationRowId != -1);
-
-        return locationRowId;
-    }
+//    static long insertJackReacherValues(Context context) {
+//        // insert our test records into the database
+//        MovieDbHelper dbHelper = new MovieDbHelper(context);
+//        SQLiteDatabase db = dbHelper.getWritableDatabase();
+//        ContentValues testValues = TestUtilities.createMovieJackReacherValues();
+//
+//        long locationRowId;
+//        locationRowId = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, testValues);
+//
+//        // Verify we got a row back.
+//        assertTrue("Error: Failure to insert North Pole Location Values", locationRowId != -1);
+//
+//        return locationRowId;
+//    }
 
     /*
         Students: The functions we provide inside of TestProvider use this utility class to test

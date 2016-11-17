@@ -87,6 +87,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         mRecyclerViewMoviesGrid.setLayoutManager(
                 new GridLayoutManager(mRecyclerViewMoviesGrid.getContext(), 2)
         );
+        mRecyclerViewMoviesGrid.setHasFixedSize(true);
         mRecyclerViewMoviesGrid.setAdapter(mMovieCursorAdapter);
 
 

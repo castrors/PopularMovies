@@ -32,6 +32,8 @@ dependencies {
     compile 'com.android.support:design:24.2.1'
     compile 'com.squareup.picasso:picasso:2.5.2'
 
+    compile 'com.facebook.stetho:stetho:1.4.1'
+
     apt 'net.simonvt.schematic:schematic-compiler:0.6.8'
     compile 'net.simonvt.schematic:schematic:0.6.8'
 
