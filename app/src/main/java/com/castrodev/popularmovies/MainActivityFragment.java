@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.ListView;
 
+import com.castrodev.popularmovies.data.MovieColumns;
 import com.castrodev.popularmovies.data.MovieContract;
 import com.castrodev.popularmovies.data.MovieProvider;
 import com.castrodev.popularmovies.rest.Movie;
@@ -120,7 +121,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         return new CursorLoader(getActivity(),
                 MovieProvider.Movies.CONTENT_URI,
                 null,
-                null,
+                MovieColumns.SORTING_PREFERENCE + " = '" + sortingPreference+ "'",
                 null,
                 null);
     }

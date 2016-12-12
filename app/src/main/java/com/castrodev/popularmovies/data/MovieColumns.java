@@ -1,16 +1,18 @@
 package com.castrodev.popularmovies.data;
 
 import net.simonvt.schematic.annotation.AutoIncrement;
+import net.simonvt.schematic.annotation.ConflictResolutionType;
 import net.simonvt.schematic.annotation.DataType;
 import net.simonvt.schematic.annotation.NotNull;
 import net.simonvt.schematic.annotation.PrimaryKey;
 import net.simonvt.schematic.annotation.Unique;
+import net.simonvt.schematic.annotation.UniqueConstraint;
 
 /**
  * Created by rodrigocastro on 31/10/16.
  */
 
-
+@UniqueConstraint(columns = {MovieColumns.ORIGINAL_TITLE}, onConflict = ConflictResolutionType.REPLACE)
 public interface MovieColumns {
 
     @DataType(DataType.Type.INTEGER)

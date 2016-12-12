@@ -30,6 +30,7 @@ public final class MovieProvider {
 
     interface Path{
         String MOVIES = "movies";
+        String SORTING = "sorting";
     }
 
     private static Uri buildUri(String ... paths){
@@ -56,5 +57,7 @@ public final class MovieProvider {
         public static Uri withId(long id){
             return buildUri(Path.MOVIES, String.valueOf(id));
         }
+
     }
+
 }

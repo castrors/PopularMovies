@@ -113,7 +113,7 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
                 return;
             }
             moviesJsonStr = buffer.toString();
-            getMovieDataFromJson(moviesJsonStr);
+            getMovieDataFromJson(moviesJsonStr, sortingOption);
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error " + e);
             return;
@@ -136,7 +136,7 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
     }
 
 
-    private void getMovieDataFromJson(String moviesJsonString)
+    private void getMovieDataFromJson(String moviesJsonString, String sortingOption)
             throws JSONException {
 
         final String TMDB_LIST = "results";
@@ -180,6 +180,7 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
                 builder.withValue(MovieColumns.SYNOPSIS, synopsis);
                 builder.withValue(MovieColumns.RATING, rating);
                 builder.withValue(MovieColumns.RELEASE_DATE, releaseDate.getTime());
+                builder.withValue(MovieColumns.SORTING_PREFERENCE, sortingOption);
                 batchOperations.add(builder.build());
 
             }

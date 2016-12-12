@@ -34,8 +34,8 @@ dependencies {
 
     compile 'com.facebook.stetho:stetho:1.4.1'
 
-    apt 'net.simonvt.schematic:schematic-compiler:0.6.8'
-    compile 'net.simonvt.schematic:schematic:0.6.8'
+    apt 'net.simonvt.schematic:schematic-compiler:0.7.0'
+    compile 'net.simonvt.schematic:schematic:0.7.0'
 
     testCompile 'junit:junit:4.12'
 }
