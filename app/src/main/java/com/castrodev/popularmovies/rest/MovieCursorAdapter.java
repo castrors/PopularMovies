@@ -9,9 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.castrodev.popularmovies.MainActivityFragment;
 import com.castrodev.popularmovies.OnItemClickListener;
 import com.castrodev.popularmovies.R;
-import com.castrodev.popularmovies.data.MovieColumns;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -55,10 +55,10 @@ public class MovieCursorAdapter extends CursorRecyclerViewAdapter<MovieCursorAda
         DatabaseUtils.dumpCursor(cursor);
 
         Picasso.with(mContext)
-                .load(IMAGE_URL_PREFIX.concat(cursor.getString(cursor.getColumnIndex(MovieColumns.IMAGE_URL))))
+                .load(IMAGE_URL_PREFIX.concat(cursor.getString(MainActivityFragment.COL_MOVIE_IMAGE_URL)))
                 .into(viewHolder.mIconView);
 
-//        mListener.onItemClick(movie);
+        mListener.onItemClick(cursor);
 
     }
 }

@@ -15,10 +15,7 @@ import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.ListView;
 
-import com.castrodev.popularmovies.data.MovieColumns;
 import com.castrodev.popularmovies.data.MovieContract;
-import com.castrodev.popularmovies.data.MovieProvider;
-import com.castrodev.popularmovies.rest.Movie;
 import com.castrodev.popularmovies.rest.MovieCursorAdapter;
 import com.castrodev.popularmovies.sync.PopularMoviesSyncAdapter;
 
@@ -47,7 +44,8 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
             MovieContract.MovieEntry.COLUMN_IMAGE_URL,
             MovieContract.MovieEntry.COLUMN_RATING,
             MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
-            MovieContract.MovieEntry.COLUMN_SYNOPSIS
+            MovieContract.MovieEntry.COLUMN_SYNOPSIS,
+            MovieContract.MovieEntry.COLUMN_REMOTE_ID
     };
 
     static final int COL_MOVIE_ID = 0;
@@ -56,12 +54,18 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
     static final int COL_MOVIE_RATING = 3;
     static final int COL_MOVIE_RELEASE_DATE = 4;
     static final int COL_MOVIE_SYNOPSIS = 5;
+    static final int COL_MOVIE_REMOTE_ID = 6;
 
 
     @Override
-    public void onItemClick(Movie movie) {
-        String sortingPreference = Utility.getPreferredSorting(getActivity());
-//        ((Callback) getActivity()).onItemSelected(MovieContract.MovieEntry.buildMovieSortingWithRemoteId(sortingPreference, ));
+    public void onItemClick(Cursor cursor) {
+        if (cursor != null) {
+            String sortingPreference = Utility.getPreferredSorting(getActivity());
+            ((Callback) getActivity())
+                    .onItemSelected(MovieContract.MovieEntry.buildMovieSortingWithRemoteId(
+                            sortingPreference, cursor.getLong(COL_MOVIE_REMOTE_ID)
+                    ));
+        }
     }
 
 
@@ -110,20 +114,24 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     private void updateMovies() {
         PopularMoviesSyncAdapter.syncImmediately(getActivity());
+        getLoaderManager().restartLoader(MOVIES_LOADER, null, this);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle bundle) {
+
+        String sortOrder = MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE + " ASC";
+
         String sortingPreference = Utility.getPreferredSorting(getActivity());
-//        Uri moviesUri = MovieContract.MovieEntry.buildMovieWithSortingPreference(
-//                sortingPreference);
+        Uri weatherForLocationUri = MovieContract.MovieEntry.buildMovieWithSortingPreference(
+                sortingPreference);
 
         return new CursorLoader(getActivity(),
-                MovieProvider.Movies.CONTENT_URI,
+                weatherForLocationUri,
+                MOVIES_COLUMNS,
                 null,
-                MovieColumns.SORTING_PREFERENCE + " = '" + sortingPreference+ "'",
                 null,
-                null);
+                sortOrder);
     }
 
     @Override

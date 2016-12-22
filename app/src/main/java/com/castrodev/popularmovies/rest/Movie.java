@@ -99,4 +99,8 @@ public class Movie implements Parcelable {
     public static Movie fromCursor(Cursor cursor) {
         return null;
     }
+
+    public long getRemoteId(){
+        return remoteId;
+    }
 }

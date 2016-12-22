@@ -1,5 +1,7 @@
 package com.castrodev.popularmovies;
 
+import android.database.Cursor;
+
 import com.castrodev.popularmovies.rest.Movie;
 
 /**
@@ -8,7 +10,7 @@ import com.castrodev.popularmovies.rest.Movie;
 
 public interface OnItemClickListener {
 
-    void onItemClick(Movie movie);
+    void onItemClick(Cursor cursor);
 
 }
 

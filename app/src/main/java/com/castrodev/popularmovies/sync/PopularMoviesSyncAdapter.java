@@ -19,8 +19,7 @@ import android.util.Log;
 import com.castrodev.popularmovies.BuildConfig;
 import com.castrodev.popularmovies.R;
 import com.castrodev.popularmovies.Utility;
-import com.castrodev.popularmovies.data.MovieColumns;
-import com.castrodev.popularmovies.data.MovieProvider;
+import com.castrodev.popularmovies.data.MovieContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -153,6 +152,7 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
             JSONArray moviesArray = moviesJson.getJSONArray(TMDB_LIST);
 
             ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
+//            Vector<ContentValues> cVVector = new Vector<ContentValues>(moviesArray.length());
 
             for (int i = 0; i < moviesArray.length(); i++) {
                 String originalTitle;
@@ -171,16 +171,25 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
                 rating = currentMovie.getDouble(MOVIE_RATING);
                 releaseDate = getDate(currentMovie.getString(MOVIE_RELEASE_DATE));
 
+//                ContentValues weatherValues = new ContentValues();
+//
+//                weatherValues.put(MovieContract.MovieEntry.COLUMN_REMOTE_ID, remoteId);
+//                weatherValues.put(MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE, originalTitle);
+//                weatherValues.put(MovieContract.MovieEntry.COLUMN_IMAGE_URL, imageUrl);
+//                weatherValues.put(MovieContract.MovieEntry.COLUMN_SYNOPSIS, synopsis);
+//                weatherValues.put(MovieContract.MovieEntry.COLUMN_RATING, rating);
+//                weatherValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, releaseDate.getTime());
+//                weatherValues.put(MovieContract.MovieEntry.COLUMN_SORTING_PREFERENCE, sortingOption);
 
                 ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
-                        MovieProvider.Movies.CONTENT_URI);
-                builder.withValue(MovieColumns.REMOTE_ID, remoteId);
-                builder.withValue(MovieColumns.ORIGINAL_TITLE, originalTitle);
-                builder.withValue(MovieColumns.IMAGE_URL, imageUrl);
-                builder.withValue(MovieColumns.SYNOPSIS, synopsis);
-                builder.withValue(MovieColumns.RATING, rating);
-                builder.withValue(MovieColumns.RELEASE_DATE, releaseDate.getTime());
-                builder.withValue(MovieColumns.SORTING_PREFERENCE, sortingOption);
+                        MovieContract.MovieEntry.CONTENT_URI);
+                builder.withValue(MovieContract.MovieEntry.COLUMN_REMOTE_ID, remoteId);
+                builder.withValue(MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE, originalTitle);
+                builder.withValue(MovieContract.MovieEntry.COLUMN_IMAGE_URL, imageUrl);
+                builder.withValue(MovieContract.MovieEntry.COLUMN_SYNOPSIS, synopsis);
+                builder.withValue(MovieContract.MovieEntry.COLUMN_RATING, rating);
+                builder.withValue(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, releaseDate.getTime());
+                builder.withValue(MovieContract.MovieEntry.COLUMN_SORTING_PREFERENCE, sortingOption);
                 batchOperations.add(builder.build());
 
             }
@@ -191,7 +200,7 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
             if (batchOperations.size() > 0) {
 
                 try {
-                    getContext().getContentResolver().applyBatch(MovieProvider.AUTHORITY, batchOperations);
+                    getContext().getContentResolver().applyBatch(MovieContract.CONTENT_AUTHORITY, batchOperations);
                 } catch (RemoteException | OperationApplicationException e) {
                     Log.e(LOG_TAG, "Error applying batch insert", e);
                 }
@@ -200,6 +209,23 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
             }
 
             Log.d(LOG_TAG, "Sync Complete. " + batchOperations.size() + " Inserted");
+
+
+//            cVVector.add(weatherValues);
+//
+//            }
+//
+//            int inserted = 0;
+//            // add to database
+//            if ( cVVector.size() > 0 ) {
+//                ContentValues[] cvArray = new ContentValues[cVVector.size()];
+//                cVVector.toArray(cvArray);
+//                getContext().getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, cvArray);
+//
+////                notifyWeather();
+//            }
+//
+//            Log.d(LOG_TAG, "Sync Complete. " + cVVector.size() + " Inserted");
 
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
