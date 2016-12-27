@@ -26,7 +26,7 @@ import android.text.format.Time;
  */
 public class MovieContract {
 
-    public static final String CONTENT_AUTHORITY = "com.castrodev.popularmovies";
+    public static final String CONTENT_AUTHORITY = "com.castrodev.popularmovies.app";
 
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 

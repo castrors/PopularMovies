@@ -50,7 +50,7 @@ public class MovieCursorAdapter extends CursorRecyclerViewAdapter<MovieCursorAda
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, Cursor cursor){
+    public void onBindViewHolder(ViewHolder viewHolder, final Cursor cursor){
 
         DatabaseUtils.dumpCursor(cursor);
 
@@ -58,7 +58,11 @@ public class MovieCursorAdapter extends CursorRecyclerViewAdapter<MovieCursorAda
                 .load(IMAGE_URL_PREFIX.concat(cursor.getString(MainActivityFragment.COL_MOVIE_IMAGE_URL)))
                 .into(viewHolder.mIconView);
 
-        mListener.onItemClick(cursor);
-
+        viewHolder.mIconView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.onItemClick(cursor);
+            }
+        });
     }
 }

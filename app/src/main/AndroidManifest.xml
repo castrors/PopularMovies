@@ -35,7 +35,7 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.castrodev.popularmovies.MainActivity" />
         </activity>
-        <activity android:name=".SettingsActivity"></activity>
+        <activity android:name=".SettingsActivity" />
 
         <provider
             android:name=".data.MovieProvider"
