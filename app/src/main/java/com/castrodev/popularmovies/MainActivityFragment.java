@@ -7,16 +7,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.ListView;
 
 import com.castrodev.popularmovies.data.MovieContract;
-import com.castrodev.popularmovies.rest.MovieCursorAdapter;
 import com.castrodev.popularmovies.sync.PopularMoviesSyncAdapter;
 
 /**
@@ -25,11 +23,12 @@ import com.castrodev.popularmovies.sync.PopularMoviesSyncAdapter;
 public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, OnItemClickListener {
     public static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
 
-    private MovieCursorAdapter mMovieCursorAdapter;
+    private MovieAdapter mMovieAdapter;
     private int mPosition = GridView.INVALID_POSITION;
-    private RecyclerView mRecyclerViewMoviesGrid;
+    private GridView mGridViewMovies;
 
-    public static final String MOVIE_OBJECT = "movie_object";
+    private static final String SELECTED_KEY = "selected_position";
+
     private static final int MOVIES_LOADER = 0;
 
     private static final String[] MOVIES_COLUMNS = {
@@ -83,17 +82,37 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
         // The ForecastAdapter will take data from a source and
         // use it to populate the ListView it's attached to.
-        mMovieCursorAdapter = new MovieCursorAdapter(getActivity(), null, this);
+        mMovieAdapter = new MovieAdapter(getActivity(), null, 0);
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         // Get a reference to the ListView, and attach this adapter to it.
-        mRecyclerViewMoviesGrid = (RecyclerView) rootView.findViewById(R.id.movies_grid);
-        mRecyclerViewMoviesGrid.setLayoutManager(
-                new GridLayoutManager(mRecyclerViewMoviesGrid.getContext(), 2)
-        );
-        mRecyclerViewMoviesGrid.setHasFixedSize(true);
-        mRecyclerViewMoviesGrid.setAdapter(mMovieCursorAdapter);
+        mGridViewMovies = (GridView) rootView.findViewById(R.id.movies_grid);
+        mGridViewMovies.setAdapter(mMovieAdapter);
+
+        mGridViewMovies.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+                // CursorAdapter returns a cursor at the correct position for getItem(), or null
+                // if it cannot seek to that position.
+                Cursor cursor = (Cursor) adapterView.getItemAtPosition(position);
+                if (cursor != null) {
+                    String sortingPreference = Utility.getPreferredSorting(getActivity());
+                    ((Callback) getActivity())
+                            .onItemSelected(MovieContract.MovieEntry.buildMovieSortingWithRemoteId(
+                                    sortingPreference, cursor.getLong(COL_MOVIE_REMOTE_ID)
+                            ));
+                }
+                mPosition = position;
+            }
+        });
+
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            // The listview probably hasn't even been populated yet.  Actually perform the
+            // swapout in onLoadFinished.
+            mPosition = savedInstanceState.getInt(SELECTED_KEY);
+        }
 
 
         return rootView;
@@ -136,11 +155,11 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        mMovieCursorAdapter.swapCursor(data);
+        mMovieAdapter.swapCursor(data);
         if (mPosition != ListView.INVALID_POSITION) {
             // If we don't need to restart the loader, and there's a desired position to restore
             // to, do so now.
-            mRecyclerViewMoviesGrid.smoothScrollToPosition(mPosition);
+            mGridViewMovies.smoothScrollToPosition(mPosition);
         }
     }
 
