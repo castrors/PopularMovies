@@ -18,6 +18,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.Date;
 
+import static com.castrodev.popularmovies.Utility.getYearFromMillis;
 import static com.castrodev.popularmovies.rest.MovieCursorAdapter.IMAGE_URL_PREFIX;
 
 /**
@@ -113,7 +114,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
             Picasso.with(getContext()).load(IMAGE_URL_PREFIX.concat(imageUrl)).into(mImageMoviePoster);
             mTextMovieTitle.setText(originalTitle);
-            mTextReleaseYear.setText(String.valueOf(releaseDate.getTime()));
+            mTextReleaseYear.setText(getYearFromMillis(releaseDate.getTime()));
             mTextRating.setText(rating.toString()+"/10");
             mTextSynopsis.setText(synopsis);
         }
