@@ -8,7 +8,7 @@
         android:id="@+id/content_detail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        tools:context="com.castrodev.popularmovies.DetailActivityFragment"
+        tools:context="com.castrodev.popularmovies.DetailFragment"
         tools:showIn="@layout/activity_detail">
 
         <TextView
@@ -19,7 +19,7 @@
             android:padding="16dp"
             android:text="@null"
             android:textAppearance="@style/TextAppearance.AppCompat.Display2"
-            android:textColor="@android:color/white"/>
+            android:textColor="@android:color/white" />
 
         <ImageView
             android:id="@+id/image_movie_poster"

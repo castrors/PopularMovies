@@ -20,8 +20,8 @@ import com.castrodev.popularmovies.sync.PopularMoviesSyncAdapter;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, OnItemClickListener {
-    public static final String LOG_TAG = MainActivityFragment.class.getSimpleName();
+public class MainFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>, OnItemClickListener {
+    public static final String LOG_TAG = MainFragment.class.getSimpleName();
 
     private MovieAdapter mMovieAdapter;
     private int mPosition = GridView.INVALID_POSITION;
@@ -73,7 +73,7 @@ public class MainActivityFragment extends Fragment implements LoaderManager.Load
         void onItemSelected(Uri movieId);
     }
 
-    public MainActivityFragment() {
+    public MainFragment() {
     }
 
     @Override

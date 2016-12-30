@@ -1,10 +1,16 @@
-<GridView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:scrollbars="vertical"
-    android:numColumns="2"
-    tools:context=".MainActivityFragment"
-    android:id="@+id/movies_grid">
-</GridView>
+    tools:context="com.castrodev.popularmovies.MainActivity">
+
+    <GridView
+        android:id="@+id/movies_grid"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:numColumns="2"
+        android:scrollbars="vertical"
+        android:stretchMode="columnWidth"
+        tools:context=".MainFragment"/>
+</FrameLayout>
+

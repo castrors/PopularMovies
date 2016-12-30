@@ -24,7 +24,7 @@ import static com.castrodev.popularmovies.rest.MovieCursorAdapter.IMAGE_URL_PREF
 /**
  * A placeholder fragment containing a simple view.
  */
-public class DetailActivityFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     static final String DETAIL_URI = "URI";
     private Uri mUri;
@@ -57,7 +57,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
     private TextView mTextRating;
     private TextView mTextSynopsis;
 
-    public DetailActivityFragment() {
+    public DetailFragment() {
     }
 
     @Override
@@ -66,7 +66,7 @@ public class DetailActivityFragment extends Fragment implements LoaderManager.Lo
 
         Bundle arguments = getArguments();
         if (arguments != null) {
-            mUri = arguments.getParcelable(DetailActivityFragment.DETAIL_URI);
+            mUri = arguments.getParcelable(DetailFragment.DETAIL_URI);
         }
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
 

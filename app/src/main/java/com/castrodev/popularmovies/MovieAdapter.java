@@ -44,8 +44,10 @@ public class MovieAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
+        int imageWidth = viewHolder.iconView.getWidth();
+        viewHolder.iconView.setMinimumHeight((int) Double.valueOf(imageWidth*1.5).longValue());
         Picasso.with(view.getContext())
-                .load(IMAGE_URL_PREFIX.concat(cursor.getString(MainActivityFragment.COL_MOVIE_IMAGE_URL)))
+                .load(IMAGE_URL_PREFIX.concat(cursor.getString(MainFragment.COL_MOVIE_IMAGE_URL)))
                 .into(viewHolder.iconView);
 
     }
