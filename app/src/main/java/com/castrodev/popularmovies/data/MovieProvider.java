@@ -34,33 +34,43 @@ public final class MovieProvider extends ContentProvider {
     static final int MOVIE_WITH_SORTING_PREFERENCE = 101;
     static final int MOVIE_WITH_SORTING_AND_REMOTE_ID = 102;
 
-    private static final SQLiteQueryBuilder sMovieQueryBuilder;
+    static final int TRAILER = 200;
+    static final int TRAILER_WITH_MOVIE_REMOTE_ID = 201;
 
-    static{
+    private static final SQLiteQueryBuilder sMovieQueryBuilder;
+    private static final SQLiteQueryBuilder sTrailerQueryBuilder;
+
+    static {
         sMovieQueryBuilder = new SQLiteQueryBuilder();
+        sTrailerQueryBuilder = new SQLiteQueryBuilder();
 
         //This is an inner join which looks like
         //weather INNER JOIN location ON weather.location_id = location._id
-        sMovieQueryBuilder.setTables(
-                MovieContract.MovieEntry.TABLE_NAME);
+//        sMovieQueryBuilder.setTables(
+//                MovieContract.MovieEntry.TABLE_NAME + " INNER JOIN " +
+//                        MovieContract.TrailerEntry.TABLE_NAME +
+//                        " ON " + MovieContract.MovieEntry.TABLE_NAME +
+//                        "." + MovieContract.MovieEntry.COLUMN_REMOTE_ID +
+//                        " = " + MovieContract.TrailerEntry.TABLE_NAME +
+//                        "." + MovieContract.TrailerEntry.COLUMN_REMOTE_ID);
+        sMovieQueryBuilder.setTables(MovieContract.MovieEntry.TABLE_NAME);
+        sTrailerQueryBuilder.setTables(MovieContract.TrailerEntry.TABLE_NAME);
     }
 
     //location.location_setting = ?
     private static final String sSortingPreferenceSelection =
-            MovieContract.MovieEntry.TABLE_NAME+
+            MovieContract.MovieEntry.TABLE_NAME +
                     "." + MovieContract.MovieEntry.COLUMN_SORTING_PREFERENCE + " = ? ";
 
-//    //location.location_setting = ? AND date >= ?
-//    private static final String sLocationSettingWithStartDateSelection =
-//            MovieContract.LocationEntry.TABLE_NAME+
-//                    "." + MovieContract.LocationEntry.COLUMN_LOCATION_SETTING + " = ? AND " +
-//                    MovieContract.MovieEntry.COLUMN_DATE + " >= ? ";
-//
     //location.location_setting = ? AND date = ?
     private static final String sMovieSortingPreferenceAndRemoteIdSelection =
             MovieContract.MovieEntry.TABLE_NAME +
                     "." + MovieContract.MovieEntry.COLUMN_SORTING_PREFERENCE + " = ? AND " +
                     MovieContract.MovieEntry.COLUMN_REMOTE_ID + " = ? ";
+
+    private static final String sTrailerRemoteIdSelection =
+            MovieContract.TrailerEntry.TABLE_NAME +
+                    "." + MovieContract.TrailerEntry.COLUMN_REMOTE_ID + " = ? ";
 
     private Cursor getMovieBySortingPreference(Uri uri, String[] projection, String sortOrder) {
         String movieSortingFromUri = MovieContract.MovieEntry.getMovieSortingFromUri(uri);
@@ -68,8 +78,8 @@ public final class MovieProvider extends ContentProvider {
         String[] selectionArgs;
         String selection;
 
-            selection = sSortingPreferenceSelection;
-            selectionArgs = new String[]{movieSortingFromUri};
+        selection = sSortingPreferenceSelection;
+        selectionArgs = new String[]{movieSortingFromUri};
 
         return sMovieQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
@@ -96,6 +106,21 @@ public final class MovieProvider extends ContentProvider {
         );
     }
 
+    private Cursor getTrailerByMovieRemoteId(
+            Uri uri, String[] projection, String sortOrder) {
+        long remoteId = MovieContract.TrailerEntry.getMovieIdFromUri(uri);
+
+        return sTrailerQueryBuilder.query(mOpenHelper.getReadableDatabase(),
+                projection,
+                sTrailerRemoteIdSelection,
+                new String[]{Long.toString(remoteId)},
+                null,
+                null,
+                sortOrder
+        );
+    }
+
+
     static UriMatcher buildUriMatcher() {
         // I know what you're thinking.  Why create a UriMatcher when you can use regular
         // expressions instead?  Because you're not crazy, that's why.
@@ -110,6 +135,8 @@ public final class MovieProvider extends ContentProvider {
         matcher.addURI(authority, MovieContract.PATH_MOVIE, MOVIE);
         matcher.addURI(authority, MovieContract.PATH_MOVIE + "/*", MOVIE_WITH_SORTING_PREFERENCE);
         matcher.addURI(authority, MovieContract.PATH_MOVIE + "/*/#", MOVIE_WITH_SORTING_AND_REMOTE_ID);
+        matcher.addURI(authority, MovieContract.PATH_TRAILER, TRAILER);
+        matcher.addURI(authority, MovieContract.PATH_TRAILER + "/*", TRAILER_WITH_MOVIE_REMOTE_ID);
 
         return matcher;
     }
@@ -154,14 +181,18 @@ public final class MovieProvider extends ContentProvider {
         Cursor retCursor;
         switch (sUriMatcher.match(uri)) {
             // "movie/*/*"
-            case MOVIE_WITH_SORTING_AND_REMOTE_ID:
-            {
+            case MOVIE_WITH_SORTING_AND_REMOTE_ID: {
                 retCursor = getMovieBySortingPreferenceAndRemoteId(uri, projection, sortOrder);
                 break;
             }
             // "movie/*"
             case MOVIE_WITH_SORTING_PREFERENCE: {
                 retCursor = getMovieBySortingPreference(uri, projection, sortOrder);
+                break;
+            }
+            // "trailer/*"
+            case TRAILER_WITH_MOVIE_REMOTE_ID: {
+                retCursor = getTrailerByMovieRemoteId(uri, projection, sortOrder);
                 break;
             }
             // "movie"
@@ -177,6 +208,20 @@ public final class MovieProvider extends ContentProvider {
                 );
                 break;
             }
+            // "trailer"
+            case TRAILER: {
+                retCursor = mOpenHelper.getReadableDatabase().query(
+                        MovieContract.TrailerEntry.TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder
+                );
+                break;
+            }
+
 
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -196,10 +241,17 @@ public final class MovieProvider extends ContentProvider {
 
         switch (match) {
             case MOVIE: {
-//                normalizeDate(values);
                 long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, values);
-                if ( _id > 0 )
+                if (_id > 0)
                     returnUri = MovieContract.MovieEntry.buildMovieUri(_id);
+                else
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+                break;
+            }
+            case TRAILER: {
+                long _id = db.insert(MovieContract.TrailerEntry.TABLE_NAME, null, values);
+                if (_id > 0)
+                    returnUri = MovieContract.TrailerEntry.buildTrailerUri(_id);
                 else
                     throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
@@ -217,11 +269,15 @@ public final class MovieProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         int rowsDeleted;
         // this makes delete all rows return the number of rows deleted
-        if ( null == selection ) selection = "1";
+        if (null == selection) selection = "1";
         switch (match) {
             case MOVIE:
                 rowsDeleted = db.delete(
                         MovieContract.MovieEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            case TRAILER:
+                rowsDeleted = db.delete(
+                        MovieContract.TrailerEntry.TABLE_NAME, selection, selectionArgs);
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
@@ -250,8 +306,11 @@ public final class MovieProvider extends ContentProvider {
 
         switch (match) {
             case MOVIE:
-//                normalizeDate(values);
                 rowsUpdated = db.update(MovieContract.MovieEntry.TABLE_NAME, values, selection,
+                        selectionArgs);
+                break;
+            case TRAILER:
+                rowsUpdated = db.update(MovieContract.TrailerEntry.TABLE_NAME, values, selection,
                         selectionArgs);
                 break;
             default:
@@ -267,14 +326,30 @@ public final class MovieProvider extends ContentProvider {
     public int bulkInsert(Uri uri, ContentValues[] values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
+        int returnCount;
         switch (match) {
             case MOVIE:
                 db.beginTransaction();
-                int returnCount = 0;
+                returnCount = 0;
                 try {
                     for (ContentValues value : values) {
-//                        normalizeDate(value);
                         long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, value);
+                        if (_id != -1) {
+                            returnCount++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                return returnCount;
+            case TRAILER:
+                db.beginTransaction();
+                returnCount = 0;
+                try {
+                    for (ContentValues value : values) {
+                        long _id = db.insert(MovieContract.TrailerEntry.TABLE_NAME, null, value);
                         if (_id != -1) {
                             returnCount++;
                         }

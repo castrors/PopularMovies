@@ -62,6 +62,9 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final int INDEX_MIN_TEMP = 2;
     private static final int INDEX_SHORT_DESC = 3;
 
+    private final String MOVIE_BASE_URL = "http://api.themoviedb.org/3";
+    private final String API_KEY_PARAM = "api_key";
+
     public PopularMoviesSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
     }
@@ -73,16 +76,22 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
 
         String sortingOption = Utility.getPreferredSorting(getContext());
 
+
+
+        if (tryToGetMovies(sortingOption)) return;
+
+        return;
+    }
+
+    private boolean tryToGetTrailers(String remoteId) {
         HttpURLConnection urlConnection = null;
         BufferedReader reader = null;
 
-        String moviesJsonStr = null;
+        String trailersJsonStr = null;
 
         try {
-            final String FORECAST_BASE_URL = "http://api.themoviedb.org/3";
-            final String API_KEY_PARAM = "api_key";
 
-            Uri builtUri = Uri.parse(FORECAST_BASE_URL.concat(sortingOption)).buildUpon()
+            Uri builtUri = Uri.parse(MOVIE_BASE_URL.concat("/movie/").concat(remoteId).concat("/videos")).buildUpon()
                     .appendQueryParameter(API_KEY_PARAM, BuildConfig.TMDB_API_KEY)
                     .build();
 
@@ -98,7 +107,7 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
             StringBuffer buffer = new StringBuffer();
             if (inputStream == null) {
                 // Nothing to do.
-                return;
+                return true;
             }
             reader = new BufferedReader(new InputStreamReader(inputStream));
 
@@ -109,13 +118,13 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
 
             if (buffer.length() == 0) {
                 // Stream was empty.  No point in parsing.
-                return;
+                return true;
             }
-            moviesJsonStr = buffer.toString();
-            getMovieDataFromJson(moviesJsonStr, sortingOption);
+            trailersJsonStr = buffer.toString();
+            getTrailerDataFromJson(trailersJsonStr, remoteId);
         } catch (IOException e) {
             Log.e(LOG_TAG, "Error " + e);
-            return;
+            return true;
         } catch (JSONException e) {
             e.printStackTrace();
         } finally {
@@ -131,7 +140,67 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
             }
         }
 
-        return;
+        return false;
+    }
+
+    private boolean tryToGetMovies(String sortingOption) {
+
+        HttpURLConnection urlConnection = null;
+        BufferedReader reader = null;
+
+        String moviesJsonStr = null;
+
+        try {
+
+            Uri builtUri = Uri.parse(MOVIE_BASE_URL.concat(sortingOption)).buildUpon()
+                    .appendQueryParameter(API_KEY_PARAM, BuildConfig.TMDB_API_KEY)
+                    .build();
+
+            URL url = new URL(builtUri.toString());
+
+            Log.v(LOG_TAG, builtUri.toString());
+
+            urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
+            urlConnection.connect();
+
+            InputStream inputStream = urlConnection.getInputStream();
+            StringBuffer buffer = new StringBuffer();
+            if (inputStream == null) {
+                // Nothing to do.
+                return true;
+            }
+            reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                buffer.append(line + "\n");
+            }
+
+            if (buffer.length() == 0) {
+                // Stream was empty.  No point in parsing.
+                return true;
+            }
+            moviesJsonStr = buffer.toString();
+            getMovieDataFromJson(moviesJsonStr, sortingOption);
+        } catch (IOException e) {
+            Log.e(LOG_TAG, "Error " + e);
+            return true;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        } finally {
+            if (urlConnection != null) {
+                urlConnection.disconnect();
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (final IOException e) {
+                    Log.e(LOG_TAG, "Error closing stream", e);
+                }
+            }
+        }
+        return false;
     }
 
 
@@ -152,7 +221,6 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
             JSONArray moviesArray = moviesJson.getJSONArray(TMDB_LIST);
 
             ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
-//            Vector<ContentValues> cVVector = new Vector<ContentValues>(moviesArray.length());
 
             for (int i = 0; i < moviesArray.length(); i++) {
                 String originalTitle;
@@ -171,15 +239,7 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
                 rating = currentMovie.getDouble(MOVIE_RATING);
                 releaseDate = getDate(currentMovie.getString(MOVIE_RELEASE_DATE));
 
-//                ContentValues weatherValues = new ContentValues();
-//
-//                weatherValues.put(MovieContract.MovieEntry.COLUMN_REMOTE_ID, remoteId);
-//                weatherValues.put(MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE, originalTitle);
-//                weatherValues.put(MovieContract.MovieEntry.COLUMN_IMAGE_URL, imageUrl);
-//                weatherValues.put(MovieContract.MovieEntry.COLUMN_SYNOPSIS, synopsis);
-//                weatherValues.put(MovieContract.MovieEntry.COLUMN_RATING, rating);
-//                weatherValues.put(MovieContract.MovieEntry.COLUMN_RELEASE_DATE, releaseDate.getTime());
-//                weatherValues.put(MovieContract.MovieEntry.COLUMN_SORTING_PREFERENCE, sortingOption);
+                tryToGetTrailers(remoteId.toString());
 
                 ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
                         MovieContract.MovieEntry.CONTENT_URI);
@@ -208,24 +268,64 @@ public class PopularMoviesSyncAdapter extends AbstractThreadedSyncAdapter {
 //                notifyWeather();
             }
 
-            Log.d(LOG_TAG, "Sync Complete. " + batchOperations.size() + " Inserted");
+            Log.d(LOG_TAG, "Sync Complete. " + batchOperations.size() + " Movies Inserted");
+
+        } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
+            e.printStackTrace();
+        }
+    }
+
+    private void getTrailerDataFromJson(String trailersJsonString, String remoteId)
+            throws JSONException {
+
+        final String TMDB_LIST = "results";
+        final String TRAILER_ID = "id";
+        final String TRAILER_KEY = "key";
+        final String TRAILER_NAME = "name";
+
+        try {
+
+            JSONObject trailersJson = new JSONObject(trailersJsonString);
+            JSONArray trailersArray = trailersJson.getJSONArray(TMDB_LIST);
+
+            ArrayList<ContentProviderOperation> batchOperations = new ArrayList<>();
+
+            for (int i = 0; i < trailersArray.length(); i++) {
+                String id;
+                String key;
+                String name;
+
+                JSONObject currentTrailer = trailersArray.getJSONObject(i);
+
+                id = currentTrailer.getString(TRAILER_ID);
+                key = currentTrailer.getString(TRAILER_KEY);
+                name = currentTrailer.getString(TRAILER_NAME);
+
+                ContentProviderOperation.Builder builder = ContentProviderOperation.newInsert(
+                        MovieContract.TrailerEntry.CONTENT_URI);
+                builder.withValue(MovieContract.TrailerEntry.COLUMN_REMOTE_ID, remoteId);
+                builder.withValue(MovieContract.TrailerEntry.COLUMN_ID, id);
+                builder.withValue(MovieContract.TrailerEntry.COLUMN_KEY, key);
+                builder.withValue(MovieContract.TrailerEntry.COLUMN_NAME, name);
+                batchOperations.add(builder.build());
+
+            }
 
 
-//            cVVector.add(weatherValues);
-//
-//            }
-//
-//            int inserted = 0;
-//            // add to database
-//            if ( cVVector.size() > 0 ) {
-//                ContentValues[] cvArray = new ContentValues[cVVector.size()];
-//                cVVector.toArray(cvArray);
-//                getContext().getContentResolver().bulkInsert(MovieContract.MovieEntry.CONTENT_URI, cvArray);
-//
-////                notifyWeather();
-//            }
-//
-//            Log.d(LOG_TAG, "Sync Complete. " + cVVector.size() + " Inserted");
+            int inserted = 0;
+            // add to database
+            if (batchOperations.size() > 0) {
+
+                try {
+                    getContext().getContentResolver().applyBatch(MovieContract.CONTENT_AUTHORITY, batchOperations);
+                } catch (RemoteException | OperationApplicationException e) {
+                    Log.e(LOG_TAG, "Error applying batch insert", e);
+                }
+
+            }
+
+            Log.d(LOG_TAG, "Sync Complete. " + batchOperations.size() + " Trailers Inserted");
 
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);

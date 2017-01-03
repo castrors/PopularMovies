@@ -31,6 +31,7 @@ public class MovieContract {
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
     public static final String PATH_MOVIE = "movie";
+    public static final String PATH_TRAILER = "trailer";
 
     public static long normalizeDate(long startDate) {
         // normalize the start date to the beginning of the (UTC) day
@@ -39,7 +40,6 @@ public class MovieContract {
         int julianDay = Time.getJulianDay(startDate, time.gmtoff);
         return time.setJulianDay(julianDay);
     }
-
 
 
     public static final class MovieEntry implements BaseColumns {
@@ -84,7 +84,38 @@ public class MovieContract {
         public static long getMovieRemoteIdFromUri(Uri uri) {
             return Long.valueOf(uri.getPathSegments().get(2));
         }
+    }
 
+    public static final class TrailerEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI =
+                BASE_CONTENT_URI.buildUpon().appendPath(PATH_TRAILER).build();
+
+        public static final String CONTENT_TYPE =
+                ContentResolver.CURSOR_DIR_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TRAILER;
+        public static final String CONTENT_ITEM_TYPE =
+                ContentResolver.CURSOR_ITEM_BASE_TYPE + "/" + CONTENT_AUTHORITY + "/" + PATH_TRAILER;
+
+        public static final String TABLE_NAME = "trailer";
+
+        public static final String COLUMN_ID = "id";
+        public static final String COLUMN_REMOTE_ID = "movie_remote_id";
+        public static final String COLUMN_KEY = "key";
+        public static final String COLUMN_NAME = "name";
+
+
+        public static Uri buildTrailerUri(long id) {
+            return ContentUris.withAppendedId(CONTENT_URI, id);
+        }
+
+        public static Uri buildTrailerWithMovieRemoteId(
+                long remoteId) {
+            return CONTENT_URI.buildUpon().appendPath(Long.toString(remoteId)).build();
+        }
+
+        public static long getMovieIdFromUri(Uri uri) {
+            return Long.valueOf(uri.getPathSegments().get(1));
+        }
 
     }
 

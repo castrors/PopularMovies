@@ -18,7 +18,6 @@ package com.castrodev.popularmovies.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import com.castrodev.popularmovies.data.MovieContract.MovieEntry;
 
 
 
@@ -40,19 +39,29 @@ public class MovieDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         // Create a table to hold locations.  A location consists of the string supplied in the
         // location setting, the city name, and the latitude and longitude
-        final String SQL_CREATE_MOVIE_TABLE = "CREATE TABLE " + MovieEntry.TABLE_NAME + " (" +
+        final String SQL_CREATE_MOVIE_TABLE = "CREATE TABLE " + MovieContract.MovieEntry.TABLE_NAME + " (" +
                 MovieContract.MovieEntry._ID + " INTEGER PRIMARY KEY," +
-                MovieEntry.COLUMN_REMOTE_ID + " INTEGER NOT NULL, " +
-                MovieEntry.COLUMN_IMAGE_URL + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_ORIGINAL_TITLE + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_SYNOPSIS + " TEXT NOT NULL, " +
-                MovieEntry.COLUMN_RATING + " REAL NOT NULL, " +
-                MovieEntry.COLUMN_RELEASE_DATE + " INTEGER NOT NULL, " +
-                MovieEntry.COLUMN_SORTING_PREFERENCE + " TEXT NOT NULL," +
-                " UNIQUE(" + MovieEntry.COLUMN_REMOTE_ID +") ON CONFLICT REPLACE " +
+                MovieContract.MovieEntry.COLUMN_REMOTE_ID + " INTEGER NOT NULL, " +
+                MovieContract.MovieEntry.COLUMN_IMAGE_URL + " TEXT NOT NULL, " +
+                MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE + " TEXT NOT NULL, " +
+                MovieContract.MovieEntry.COLUMN_SYNOPSIS + " TEXT NOT NULL, " +
+                MovieContract.MovieEntry.COLUMN_RATING + " REAL NOT NULL, " +
+                MovieContract.MovieEntry.COLUMN_RELEASE_DATE + " INTEGER NOT NULL, " +
+                MovieContract.MovieEntry.COLUMN_SORTING_PREFERENCE + " TEXT NOT NULL," +
+                " UNIQUE(" + MovieContract.MovieEntry.COLUMN_REMOTE_ID +") ON CONFLICT REPLACE " +
+                " );";
+
+        final String SQL_CREATE_TRAILER_TABLE = "CREATE TABLE " + MovieContract.TrailerEntry.TABLE_NAME + " (" +
+                MovieContract.TrailerEntry._ID + " INTEGER PRIMARY KEY," +
+                MovieContract.TrailerEntry.COLUMN_ID + " INTEGER NOT NULL, " +
+                MovieContract.TrailerEntry.COLUMN_REMOTE_ID + " INTEGER NOT NULL, " +
+                MovieContract.TrailerEntry.COLUMN_KEY + " TEXT NOT NULL, " +
+                MovieContract.TrailerEntry.COLUMN_NAME + " TEXT NOT NULL, " +
+                " UNIQUE(" + MovieContract.TrailerEntry.COLUMN_ID +") ON CONFLICT REPLACE " +
                 " );";
 
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE);
+        sqLiteDatabase.execSQL(SQL_CREATE_TRAILER_TABLE);
     }
 
     @Override
@@ -63,7 +72,8 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         // It does NOT depend on the version number for your application.
         // If you want to update the schema without wiping data, commenting out the next line
         // should be your top priority before modifying this method.
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieContract.MovieEntry.TABLE_NAME);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + MovieContract.TrailerEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 }
