@@ -230,30 +230,27 @@ public final class MovieProvider extends ContentProvider {
         return retCursor;
     }
 
-    /*
-        Student: Add the ability to insert Locations to the implementation of this function.
-     */
     @Override
     public Uri insert(Uri uri, ContentValues values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
-        Uri returnUri;
+        Uri returnUri = null;
 
         switch (match) {
             case MOVIE: {
                 long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, values);
                 if (_id > 0)
                     returnUri = MovieContract.MovieEntry.buildMovieUri(_id);
-                else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+//                else
+//                    throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
             case TRAILER: {
                 long _id = db.insert(MovieContract.TrailerEntry.TABLE_NAME, null, values);
                 if (_id > 0)
                     returnUri = MovieContract.TrailerEntry.buildTrailerUri(_id);
-                else
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
+//                else
+//                    throw new android.database.SQLException("Failed to insert row into " + uri);
                 break;
             }
             default:

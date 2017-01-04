@@ -48,7 +48,8 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MovieContract.MovieEntry.COLUMN_RATING + " REAL NOT NULL, " +
                 MovieContract.MovieEntry.COLUMN_RELEASE_DATE + " INTEGER NOT NULL, " +
                 MovieContract.MovieEntry.COLUMN_SORTING_PREFERENCE + " TEXT NOT NULL," +
-                " UNIQUE(" + MovieContract.MovieEntry.COLUMN_REMOTE_ID +") ON CONFLICT REPLACE " +
+                MovieContract.MovieEntry.COLUMN_FAVORITED + " INTEGER DEFAULT 0," +
+                " UNIQUE(" + MovieContract.MovieEntry.COLUMN_REMOTE_ID +") " +
                 " );";
 
         final String SQL_CREATE_TRAILER_TABLE = "CREATE TABLE " + MovieContract.TrailerEntry.TABLE_NAME + " (" +
@@ -57,7 +58,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                 MovieContract.TrailerEntry.COLUMN_REMOTE_ID + " INTEGER NOT NULL, " +
                 MovieContract.TrailerEntry.COLUMN_KEY + " TEXT NOT NULL, " +
                 MovieContract.TrailerEntry.COLUMN_NAME + " TEXT NOT NULL, " +
-                " UNIQUE(" + MovieContract.TrailerEntry.COLUMN_ID +") ON CONFLICT REPLACE " +
+                " UNIQUE(" + MovieContract.TrailerEntry.COLUMN_ID +") " +
                 " );";
 
         sqLiteDatabase.execSQL(SQL_CREATE_MOVIE_TABLE);

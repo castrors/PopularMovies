@@ -10,4 +10,7 @@
     <string name="pref_sorting_top_rated" translatable="false">/movie/top_rated?</string>
     <string name="content_authority">com.castrodev.popularmovies.app</string>
     <string name="sync_account_type">popularmovies.castrodev.com</string>
+    <string name="trailers">Trailers</string>
+    <string name="mark_as_favorite">Mark as favorite</string>
+    <string name="remove_favorite">Remove favorite</string>
 </resources>
