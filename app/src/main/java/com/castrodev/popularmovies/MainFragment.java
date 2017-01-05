@@ -17,6 +17,8 @@ import android.widget.ListView;
 import com.castrodev.popularmovies.data.MovieContract;
 import com.castrodev.popularmovies.sync.PopularMoviesSyncAdapter;
 
+import static com.castrodev.popularmovies.data.MovieContract.MovieEntry.FAVORITED_TRUE;
+
 /**
  * A placeholder fragment containing a simple view.
  */
@@ -44,7 +46,8 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
             MovieContract.MovieEntry.COLUMN_RATING,
             MovieContract.MovieEntry.COLUMN_RELEASE_DATE,
             MovieContract.MovieEntry.COLUMN_SYNOPSIS,
-            MovieContract.MovieEntry.COLUMN_REMOTE_ID
+            MovieContract.MovieEntry.COLUMN_REMOTE_ID,
+            MovieContract.MovieEntry.COLUMN_FAVORITED
     };
 
     static final int COL_MOVIE_ID = 0;
@@ -142,14 +145,24 @@ public class MainFragment extends Fragment implements LoaderManager.LoaderCallba
         String sortOrder = MovieContract.MovieEntry.COLUMN_ORIGINAL_TITLE + " ASC";
 
         String sortingPreference = Utility.getPreferredSorting(getActivity());
-        Uri weatherForLocationUri = MovieContract.MovieEntry.buildMovieWithSortingPreference(
-                sortingPreference);
 
+        Uri uri = MovieContract.MovieEntry.CONTENT_URI;
+        String selectionClause = null;
+        String[] selectionArgs = null;
+
+        if (sortingPreference.equals(getString(R.string.pref_sorting_favorited))) {
+            selectionClause = MovieContract.MovieEntry.COLUMN_FAVORITED + " = ?";
+            selectionArgs = new String[]{String.valueOf(FAVORITED_TRUE)};
+        } else {
+            uri = MovieContract.MovieEntry.buildMovieWithSortingPreference(
+                    sortingPreference);
+        }
+        
         return new CursorLoader(getActivity(),
-                weatherForLocationUri,
+                uri,
                 MOVIES_COLUMNS,
-                null,
-                null,
+                selectionClause,
+                selectionArgs,
                 sortOrder);
     }
 

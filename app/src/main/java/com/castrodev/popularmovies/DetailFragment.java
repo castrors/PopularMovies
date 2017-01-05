@@ -24,6 +24,8 @@ import com.squareup.picasso.Picasso;
 import java.util.Date;
 
 import static com.castrodev.popularmovies.Utility.getYearFromMillis;
+import static com.castrodev.popularmovies.data.MovieContract.MovieEntry.FAVORITED_FALSE;
+import static com.castrodev.popularmovies.data.MovieContract.MovieEntry.FAVORITED_TRUE;
 import static com.castrodev.popularmovies.rest.MovieCursorAdapter.IMAGE_URL_PREFIX;
 
 /**
@@ -106,6 +108,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mButtonFavorited.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 ContentValues mUpdateValues = new ContentValues();
 
                 String mSelectionClause = MovieContract.MovieEntry.COLUMN_REMOTE_ID + " = ?";
@@ -113,7 +116,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
                 int mRowsUpdated = 0;
 
-                mUpdateValues.put(MovieContract.MovieEntry.COLUMN_FAVORITED, favorited == 0 ? 1 : 0);
+                mUpdateValues.put(MovieContract.MovieEntry.COLUMN_FAVORITED, favorited == FAVORITED_FALSE ? FAVORITED_TRUE : FAVORITED_FALSE);
 
                 mRowsUpdated = getActivity().getContentResolver().update(
                         MovieContract.MovieEntry.CONTENT_URI,

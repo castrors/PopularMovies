@@ -63,6 +63,9 @@ public class MovieContract {
         public static final String COLUMN_SORTING_PREFERENCE = "sorting_preference";
         public static final String COLUMN_FAVORITED = "favorited";
 
+        public static final int FAVORITED_TRUE = 1;
+        public static final int FAVORITED_FALSE = 0;
+
 
         public static Uri buildMovieUri(long id) {
             return ContentUris.withAppendedId(CONTENT_URI, id);
