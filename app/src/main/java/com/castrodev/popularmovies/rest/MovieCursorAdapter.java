@@ -9,8 +9,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.castrodev.popularmovies.MainFragment;
-import com.castrodev.popularmovies.OnItemClickListener;
+import com.castrodev.popularmovies.view.MainFragment;
+import com.castrodev.popularmovies.listener.OnItemClickListener;
 import com.castrodev.popularmovies.R;
 import com.squareup.picasso.Picasso;
 

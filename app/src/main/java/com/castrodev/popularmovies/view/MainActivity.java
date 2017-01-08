@@ -1,4 +1,4 @@
-package com.castrodev.popularmovies;
+package com.castrodev.popularmovies.view;
 
 import android.content.Intent;
 import android.net.Uri;
@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.castrodev.popularmovies.R;
 import com.castrodev.popularmovies.sync.PopularMoviesSyncAdapter;
 
 public class MainActivity extends AppCompatActivity implements MainFragment.Callback {

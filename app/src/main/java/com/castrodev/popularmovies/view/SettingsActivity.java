@@ -1,4 +1,4 @@
-package com.castrodev.popularmovies;
+package com.castrodev.popularmovies.view;
 
 import android.database.Cursor;
 import android.os.Bundle;
@@ -8,6 +8,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
+import com.castrodev.popularmovies.R;
 import com.castrodev.popularmovies.data.MovieContract;
 
 import java.util.ArrayList;

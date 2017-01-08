@@ -1,4 +1,4 @@
-package com.castrodev.popularmovies;
+package com.castrodev.popularmovies.listener;
 
 import android.database.Cursor;
 

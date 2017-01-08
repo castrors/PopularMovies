@@ -1,4 +1,4 @@
-package com.castrodev.popularmovies;
+package com.castrodev.popularmovies.view;
 
 import android.content.ContentValues;
 import android.content.Intent;
@@ -18,12 +18,15 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.castrodev.popularmovies.listener.OnItemClickListener;
+import com.castrodev.popularmovies.R;
+import com.castrodev.popularmovies.adapter.TrailerAdapter;
 import com.castrodev.popularmovies.data.MovieContract;
 import com.squareup.picasso.Picasso;
 
 import java.util.Date;
 
-import static com.castrodev.popularmovies.Utility.getYearFromMillis;
+import static com.castrodev.popularmovies.util.Utility.getYearFromMillis;
 import static com.castrodev.popularmovies.data.MovieContract.MovieEntry.FAVORITED_FALSE;
 import static com.castrodev.popularmovies.data.MovieContract.MovieEntry.FAVORITED_TRUE;
 import static com.castrodev.popularmovies.rest.MovieCursorAdapter.IMAGE_URL_PREFIX;

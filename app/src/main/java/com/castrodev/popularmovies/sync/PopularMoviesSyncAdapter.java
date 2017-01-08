@@ -18,7 +18,7 @@ import android.util.Log;
 
 import com.castrodev.popularmovies.BuildConfig;
 import com.castrodev.popularmovies.R;
-import com.castrodev.popularmovies.Utility;
+import com.castrodev.popularmovies.util.Utility;
 import com.castrodev.popularmovies.data.MovieContract;
 
 import org.json.JSONArray;

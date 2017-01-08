@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        tools:context="com.castrodev.popularmovies.DetailFragment"
+        tools:context="com.castrodev.popularmovies.view.DetailFragment"
         tools:showIn="@layout/activity_detail">
 
         <TextView

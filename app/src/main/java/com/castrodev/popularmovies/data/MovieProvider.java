@@ -63,10 +63,9 @@ public final class MovieProvider extends ContentProvider {
                     "." + MovieContract.MovieEntry.COLUMN_SORTING_PREFERENCE + " = ? ";
 
     //location.location_setting = ? AND date = ?
-    private static final String sMovieSortingPreferenceAndRemoteIdSelection =
+    private static final String sMovieRemoteIdSelection =
             MovieContract.MovieEntry.TABLE_NAME +
-                    "." + MovieContract.MovieEntry.COLUMN_SORTING_PREFERENCE + " = ? AND " +
-                    MovieContract.MovieEntry.COLUMN_REMOTE_ID + " = ? ";
+                    "." + MovieContract.MovieEntry.COLUMN_REMOTE_ID + " = ? ";
 
     private static final String sTrailerRemoteIdSelection =
             MovieContract.TrailerEntry.TABLE_NAME +
@@ -91,15 +90,14 @@ public final class MovieProvider extends ContentProvider {
         );
     }
 
-    private Cursor getMovieBySortingPreferenceAndRemoteId(
+    private Cursor getMovieByRemoteId(
             Uri uri, String[] projection, String sortOrder) {
-        String sortingPreference = MovieContract.MovieEntry.getMovieSortingFromUri(uri);
         long remoteId = MovieContract.MovieEntry.getMovieRemoteIdFromUri(uri);
 
         return sMovieQueryBuilder.query(mOpenHelper.getReadableDatabase(),
                 projection,
-                sMovieSortingPreferenceAndRemoteIdSelection,
-                new String[]{sortingPreference, Long.toString(remoteId)},
+                sMovieRemoteIdSelection,
+                new String[]{Long.toString(remoteId)},
                 null,
                 null,
                 sortOrder
@@ -182,7 +180,7 @@ public final class MovieProvider extends ContentProvider {
         switch (sUriMatcher.match(uri)) {
             // "movie/*/*"
             case MOVIE_WITH_SORTING_AND_REMOTE_ID: {
-                retCursor = getMovieBySortingPreferenceAndRemoteId(uri, projection, sortOrder);
+                retCursor = getMovieByRemoteId(uri, projection, sortOrder);
                 break;
             }
             // "movie/*"

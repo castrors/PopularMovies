@@ -17,7 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".MainActivity"
+            android:name=".view.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -27,15 +27,15 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".DetailActivity"
+            android:name=".view.DetailActivity"
             android:label="@string/title_activity_detail"
-            android:parentActivityName=".MainActivity"
+            android:parentActivityName=".view.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.castrodev.popularmovies.MainActivity" />
+                android:value="com.castrodev.popularmovies.view.MainActivity" />
         </activity>
-        <activity android:name=".SettingsActivity" />
+        <activity android:name=".view.SettingsActivity" />
 
         <provider
             android:name=".data.MovieProvider"

@@ -1,4 +1,4 @@
-package com.castrodev.popularmovies;
+package com.castrodev.popularmovies.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.castrodev.popularmovies.R;
+import com.castrodev.popularmovies.view.MainFragment;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -44,8 +46,6 @@ public class MovieAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         ViewHolder viewHolder = (ViewHolder) view.getTag();
-        int imageWidth = viewHolder.iconView.getWidth();
-        viewHolder.iconView.setMinimumHeight((int) Double.valueOf(imageWidth*1.5).longValue());
         Picasso.with(view.getContext())
                 .load(IMAGE_URL_PREFIX.concat(cursor.getString(MainFragment.COL_MOVIE_IMAGE_URL)))
                 .into(viewHolder.iconView);

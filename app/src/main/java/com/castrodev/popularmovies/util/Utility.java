@@ -1,8 +1,10 @@
-package com.castrodev.popularmovies;
+package com.castrodev.popularmovies.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+
+import com.castrodev.popularmovies.R;
 
 import java.util.Calendar;
 
